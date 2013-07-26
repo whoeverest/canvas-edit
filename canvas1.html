@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Canvas Running</title>
+	<style type="text/css">
+	html, body {
+		margin: 0;
+		padding: 0;
+	}
+	#left, #right {
+		float: left;
+		width: 48%;
+	}
+
+	#left {
+		border-right: 3px solid #eee;
+		border-bottom: 3px solid #eee;
+	}
+	</style>
+</head>
+
+<body>
+	<div id="main">
+		<div id="left"><div id="source"></div><div id="error"></div></div>
+		<div id="right"><canvas id="canvas"></canvas></div>
+	</div>
+</body>
+<link rel="stylesheet" type="text/css" href="codemirror-3.14/lib/codemirror.css"></style>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+<script type="text/javascript" src="codemirror-3.14/lib/codemirror.js"></script>
+<script type="text/javascript" src="codemirror-3.14/mode/javascript/javascript.js"></script>
+<script type="text/javascript">
+
+	var editor = CodeMirror(document.getElementById('source'), {
+	  mode: "javascript",
+	  lineNumbers: true,
+	});
+
+	var canvas = document.getElementById('canvas')
+	var ctx = canvas.getContext('2d')
+
+	editor.setValue(localStorage.getItem('code') || '');
+
+	$(function() {
+		var h = $(window).height();
+		var w = $(window).width();
+
+		$('#canvas').height(h);
+		canvas.width = w / 2;
+		canvas.height = h;
+	})
+
+	setInterval(function(){
+		ctx.fillStyle = 'white';
+		ctx.fillRect(0, 0, canvas.width, canvas.height)
+		var hadErr = false;
+		try {
+			eval(editor.getValue());
+		} catch (e) {
+			$('#error').text(e);
+			hadErr = true;
+		} finally {
+			if (!hadErr) {
+				$('#error').text('');
+			}
+		}
+
+		localStorage.setItem('code', editor.getValue());
+	}, 300)
+
+</script>
+</html>
